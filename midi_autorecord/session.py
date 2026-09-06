@@ -85,8 +85,11 @@ class RecordingSession:
             self._cv.notify_all()
 
     def _start_take(self, mono: float) -> RecordingTake:
-        wall = datetime.now(tz=UTC)
-        stem = f"{self.device.id}__{wall.replace(microsecond=0).isoformat()}"
+        # Local wall-clock time without a timezone specifier, e.g.
+        # "2026-09-05T20:41:50__piano".
+        wall = datetime.now(UTC).astimezone().replace(tzinfo=None)
+        time_str = wall.replace(microsecond=0).isoformat().replace(":", "-")
+        stem = f"{time_str}__{self.device.id}"
         take = RecordingTake(stem, mono)
         self._take = take
         log.info("take start %s (client %d:%d)", stem, self.client, self.port)

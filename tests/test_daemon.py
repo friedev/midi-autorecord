@@ -37,7 +37,7 @@ def test_daemon_records_and_finalizes(tmp_config, fake_device):
             break
         time.sleep(0.05)
 
-    midis = list(tmp_config.output_dir.glob("testdev__*.mid"))
+    midis = list(tmp_config.output_dir.glob("*__testdev.mid"))
     assert midis, "expected a finalized .mid file"
     midi = mido.MidiFile(str(midis[0]))
     messages = list(midi.tracks[0])
