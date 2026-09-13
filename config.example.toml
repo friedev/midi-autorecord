@@ -1,16 +1,17 @@
 # Directory for finalized .mid output files.
 output_dir = "~/midi-autorecord"
 
-# Seconds of silence (no MIDI messages) before a take is finalized.
+# Seconds of silence (i.e. no MIDI note messages) before a take is finalized.
 silence_timeout_seconds = 30
 
-# SMF timing parameters used by the Finalizer.
+# SMF timing parameters
 ticks_per_beat = 480
 tempo_microseconds_per_beat = 500000
 
 # Devices to watch, matched against the ALSA sequencer client and port name.
 [devices]
 
+# These are just examples from my setup; replace these with your own devices.
 [devices.piano]
 client = "Digital Piano"
 port = "Digital Piano MIDI 1"
