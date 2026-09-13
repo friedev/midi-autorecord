@@ -88,11 +88,12 @@ class RecordingSession:
         # Local wall-clock time without a timezone specifier, e.g.
         # "2026-09-05T20:41:50__piano".
         wall = datetime.now(UTC).astimezone().replace(tzinfo=None)
-        time_str = wall.replace(microsecond=0).isoformat().replace(":", "-")
-        stem = f"{time_str}__{self.device.id}"
+        stem = wall.replace(microsecond=0).isoformat().replace(":", "-")
         take = RecordingTake(stem, mono)
         self._take = take
-        log.info("take start %s (client %d:%d)", stem, self.client, self.port)
+        log.info(
+            f"take start {self.device.id}/{stem} (client {self.client}:{self.port})"
+        )
         return take
 
     # WATCHDOG THREAD
@@ -119,12 +120,12 @@ class RecordingSession:
         take = self._take
         assert take is not None
         self._take = None
-        out = self._output_dir / (take.stem + ".mid")
+        out = self._output_dir / self.device.id / (take.stem + ".mid")
         wrote = write_midi(take.messages, out, self._ticks, self._tempo)
         if wrote:
-            log.info("take finalized %s -> %s", take.stem, out)
+            log.info(f"take finalized {self.device.id}/{take.stem} -> {out}")
         else:
-            log.info("take finalized %s: no notes, dropped", take.stem)
+            log.info(f"take finalized {self.device.id}/{take.stem}: no notes, dropped")
 
     # CONTROL
 
