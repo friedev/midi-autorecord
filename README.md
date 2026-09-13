@@ -1,28 +1,35 @@
 # midi-autorecord
 
-A headless background daemon (Linux, ALSA sequencer) that watches for named
-external MIDI devices, records their input, and writes each take to a
-Standard MIDI File after a configurable silence timeout (or on device
-disconnect / shutdown).
+A headless background daemon that watches for named external MIDI input devices and automatically records their input to Standard MIDI Files.
+Written in Python for Linux + ALSA, with systemd support.
+
+> [!WARNING]
+> **Slop alert!**
+> The initial version of this project was entirely vibe coded.
+> Although I have reviewed the code myself and used it without issue, your mileage may vary.
+
+## Motivation
+
+I like to spontaneously noodle around on the piano, but I rarely bother to start a recording.
+Sometimes, though, I'll play something I think is neat and wish I'd recorded it.
+
+That's where this project comes in!
+Now every take gets automatically saved as MIDI file I can play back or even import straight into a DAW.
 
 ## Features
 
-- Matches devices by **name** (ALSA client + port), not by unstable client
-  numbers, so reconnects and reboots are handled automatically.
-- One independent recording session per connected device; each session emits
-  its own `.mid` files.
-- Takes start on the first note and finalize after a silence timeout, with
-  leading/trailing silence trimmed and the first note anchored at time 0.
-- Runs as a `systemd --user` service, started at login.
+- Matches devices by **name** (ALSA client + port identifiers), not by client/port *numbers*, which are unstable in my experience.
+- Gracefully handles device disconnects/reconnects and service interruptions.
+- Simultaneous recording of takes on all connected devices.
+- Takes start on the first note and finalize after a silence timeout, with leading/trailing silence trimmed.
 
 ## Dependencies
 
 - `mido`
 - [`pyalsa`](https://github.com/alsa-project/alsa-python)
 
-The official `pyalsa` is not published to PyPI, so it is pulled from the ALSA
-project's git tag. Building it requires a C compiler and `libasound` development
-headers at install time.
+The official `pyalsa` is not published to PyPI, so it is pulled from the ALSA project's git tag.
+Building it requires a C compiler and `libasound` development headers at install time.
 
 ## Install
 
@@ -40,10 +47,11 @@ cp config.example.toml ~/.config/midi-autorecord/config.toml
 # edit device names (see `aconnect -l`)
 ```
 
-See [`config.example.toml`](config.example.toml). Paths support `~` expansion.
+See [`config.example.toml`](config.example.toml).
+Paths support `~` expansion.
 Devices are matched against the ALSA client and port name (first match wins).
 
-## Run as a user service
+## Run as a systemd user service
 
 ```sh
 mkdir -p ~/.config/systemd/user
@@ -67,3 +75,8 @@ uv run ruff format .
 uv run ruff check --fix .
 uv run ty check .
 ```
+
+## See also
+
+- [listen](https://github.com/danieljweinberg/listen): a very similar project, written in Bash
+- `arecordmidi`: the absolute bare-bones, zero-dependency alternative to this, without all the conveniences
